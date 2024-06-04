@@ -8,4 +8,5 @@ pretty_assertions = "1.4.0"
 
 [dependencies]
 ring-compat = "0.8.0"
+serde = { version = "1.0.203", features = ["derive"] }
 thiserror = "1.0.61"
