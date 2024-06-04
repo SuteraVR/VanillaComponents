@@ -1,10 +1,10 @@
 [package]
-name = "gateway"
+name = "sutera-lib"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tokio = { version = "1.38.0", features = ["full"] }
+ed25519 = "2.2.3"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
