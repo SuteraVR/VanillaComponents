@@ -123,7 +123,7 @@ mod tests {
     use ring_compat::signature::ed25519;
 
     #[test]
-    fn test_sutera_identity_string() {
+    fn sutera_identity_string() {
         // ダミーの公開鍵(全てのビットが0)のSuteraIdentityを作成, 文字列に変換
         let identity = SuteraIdentity {
             kind: SuteraIdentityKind::User,
@@ -143,7 +143,27 @@ mod tests {
     }
 
     #[test]
-    fn test_sutera_identity_string_version_mismatch() {
+    fn sutera_identity_string_without_name() {
+        // ダミーの公開鍵(全てのビットが0)のSuteraIdentityを作成, 文字列に変換
+        let identity = SuteraIdentity {
+            kind: SuteraIdentityKind::User,
+            display_name: None,
+            pub_signature: ed25519::VerifyingKey([0; 32]),
+        };
+
+        let identity_str: String = identity.clone().into();
+        assert_eq!(
+            identity_str,
+            "user.sutera-identity-v1.0000000000000000000000000000000000000000000000000000000000000000"
+        );
+
+        // 変換した文字列をSuteraIdentityに戻し, オリジナルのSuteraIdentityと一致するか検証
+        let parsed_identity: SuteraIdentity = identity_str.try_into().unwrap();
+        assert_eq!(identity, parsed_identity);
+    }
+
+    #[test]
+    fn sutera_identity_string_version_mismatch() {
         // バージョンが異なる文字列をSuteraIdentityに変換しようとした場合のエラーを検証
         let invalid_identity_str = "see2et.sutera-identity-v2.xxx";
         assert_eq!(
@@ -155,7 +175,7 @@ mod tests {
     }
 
     #[test]
-    fn test_sutera_identity_string_invalid() {
+    fn sutera_identity_string_invalid() {
         // 不正な文字列をSuteraIdentityに変換しようとした場合にエラーにちゃんとなるか検証
 
         let invalid_identity_str = "user.sutera-identity-v1";
