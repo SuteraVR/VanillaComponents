@@ -11,4 +11,5 @@ serde_json = "1.0.117"
 rand_core = { version = "0.6.4", features = ["std"] }
 ring-compat = "0.8.0"
 serde = { version = "1.0.203", features = ["derive"] }
+strum = { version = "0.26.2", features = ["derive"] }
 thiserror = "1.0.61"

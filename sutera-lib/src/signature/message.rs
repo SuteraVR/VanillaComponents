@@ -108,6 +108,8 @@ struct SuteraSignedMessagePayload {
 
 #[cfg(test)]
 mod tests {
+    use crate::signature::identity::SuteraIdentityKind;
+
     use super::*;
     use pretty_assertions::assert_eq;
     use rand_core::{OsRng, RngCore};
@@ -120,7 +122,8 @@ mod tests {
 
         // 秘密鍵からSuteraIdentityを生成
         let identity = SuteraIdentity {
-            display_name: "see2et".to_string(),
+            kind: SuteraIdentityKind::User,
+            display_name: Some("see2et".to_string()),
             pub_signature: secret.verifying_key(),
         };
 
