@@ -56,7 +56,7 @@ impl SuteraSignedMessage {
     }
 
     /// Check if the signature is valid.
-    /// 署名が有効かどうかを確認する。
+    /// 署名が有効かどうかを確認します。
     ///
     /// **SuteraSignedMessage should be verified before processing the message.**
     /// **SuteraSignedMessageはメッセージが処理される前に検証されなければいけません。**
@@ -64,7 +64,7 @@ impl SuteraSignedMessage {
     /// **The signature is once checked at the time of creation in normal scenario,**
     /// **so this method is used as a assertion.**
     /// **署名は通常の場合、作成されたタイミングで一度検証されます。**
-    /// **そのため、このメソッドはアサーションとして利用される。**
+    /// **そのため、このメソッドはアサーションとして利用されます。**
     /// TODO: assertionの良い和訳がわかりません！
     ///
     /// ## Return / 戻り値
