@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 /// A common structure of message exchanged within the Sutera network.
+/// Suteraネットワークにおけるメッセージの送受信に使用される構造体です。
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SuteraSignedMessage {
     pub author: SuteraIdentity,
@@ -14,6 +15,7 @@ pub struct SuteraSignedMessage {
 }
 
 /// An error that occurs when signing a message.
+/// メッセージの署名時に起きるエラー。
 #[derive(Debug, Error)]
 pub enum SuteraMessageSigningError {
     #[error("the signing key does not match the author's verifying key")]
@@ -22,15 +24,18 @@ pub enum SuteraMessageSigningError {
 
 impl SuteraSignedMessage {
     /// Sign a message with the author's signing key.
+    /// 署名者の署名鍵でメッセージを署名する。
     ///
-    /// ## Parameters
-    /// - `author`: The author of the message.
-    /// - `message`: The content of the message.
-    /// - `signer`: The signing key of the author.
+    /// ## Parameters / パラメーター
+    /// - `author`: The author of the message. / メッセージの署名者。
+    /// - `message`: The content of the message. / メッセージの内容。
+    /// - `signer`: The signing key of the author. / 署名者の署名鍵。
     ///
-    /// ## Returns
+    /// ## Returns / 戻り値
     /// A new signed message.
     /// if the signing key does not match the author's verifying key, return `Err`.
+    /// 新たに署名されたメッセージが返却されます。
+    /// 署名鍵が署名者の認証鍵と合致しない場合、`Err`が返却されます。
     pub fn new(
         author: SuteraIdentity,
         message: String,
@@ -51,14 +56,20 @@ impl SuteraSignedMessage {
     }
 
     /// Check if the signature is valid.
+    /// 署名が有効かどうかを確認する。
     ///
     /// **SuteraSignedMessage should be verified before processing the message.**
+    /// **SuteraSignedMessageはメッセージが処理される前に検証されなければいけません。**
     ///
     /// **The signature is once checked at the time of creation in normal scenario,**
     /// **so this method is used as a assertion.**
+    /// **署名は通常の場合、作成されたタイミングで一度検証されます。**
+    /// **そのため、このメソッドはアサーションとして利用される。**
+    /// TODO: assertionの良い和訳がわかりません！
     ///
-    /// ## Return
+    /// ## Return / 戻り値
     /// `true` if the signature is valid, otherwise `false`.
+    /// 署名が有効な場合は`true`、そうでない場合は`false`を返します。
     pub fn verify(&self) -> bool {
         self.author
             .pub_signature
