@@ -49,7 +49,7 @@ pub struct SuteraIdentity {
 /// Because pub_signature is 32byte, so the part `{pub_signature}` is 64 letters hexadecimal string.  
 /// SuteraIdentityを文字列に変換します。
 /// 形式は `{type}@{display_name}.sutera-identity-v1.{pub_signature}` です。
-/// TODO: ここよく分からない！
+/// pub_signatureは32バイトなので、`{pub_signature}`は64文字の16進数文字列になります。
 ///
 /// ## Example
 /// ```no_test
