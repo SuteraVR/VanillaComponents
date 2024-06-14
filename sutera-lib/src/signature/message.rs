@@ -26,7 +26,7 @@ impl SuteraSignedMessage {
     /// Sign a message with the author's signing key.
     /// 署名者の署名鍵でメッセージを署名する。
     ///
-    /// ## Parameters / パラメーター
+    /// ## Parameters / 引数
     /// - `author`: The author of the message. / メッセージの署名者。
     /// - `message`: The content of the message. / メッセージの内容。
     /// - `signer`: The signing key of the author. / 署名者の署名鍵。
