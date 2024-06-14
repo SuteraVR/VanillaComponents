@@ -4,6 +4,7 @@ use ring_compat::signature::ed25519;
 use thiserror::Error;
 
 /// An error that occurs when parsing a Sutera identity string.
+/// Sutera-identity-stringをパースする際に起きるエラー。
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum SuteraIdentityStringParseError {
     #[error("invalid identity string")]
@@ -21,24 +22,34 @@ pub enum SuteraIdentityKind {
 }
 
 /// A struct representing an identity in the Sutera network.
+/// Suteraネットワークにおけるidentityを表す構造体。
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SuteraIdentity {
     /// The kind of object treated in the Sutera network (e.g., user, server, world etc.)
+    /// Suteraネットワークで扱うオブジェクトの種類 (例: ユーザー、サーバー、ワールドなど)
     pub kind: SuteraIdentityKind,
 
     /// The display name of the identity.  
     /// This is only designated for human-readable purposes and plays no role in authentication.  
     /// display_name can only contain alphanumeric characters (0-9, a-z)
+    /// identityの表示名。
+    /// これは人間の理解を促進するためだけに定義されており、認証プロセスにおいて何の役目も果たしません。
+    /// 表示名には英数字(0-9, a-z)のみを利用することができます。
     pub display_name: Option<String>,
 
     /// The ed25519 public key of the identity.  
     /// This is used to verify the signature of the identity.
+    /// identityのed25519公開鍵です。
+    /// identityの署名を検証されるために使用されます。
     pub pub_signature: ed25519::VerifyingKey,
 }
 
 /// Convert SuteraIdentity to String.  
 /// The format is `{type}@{display_name}.sutera-identity-v1.{pub_signature}`.  
 /// Because pub_signature is 32byte, so the part `{pub_signature}` is 64 letters hexadecimal string.  
+/// SuteraIdentityを文字列に変換します。
+/// 形式は `{type}@{display_name}.sutera-identity-v1.{pub_signature}` です。
+/// pub_signatureは32バイトなので、`{pub_signature}`は64文字の16進数文字列になります。
 ///
 /// ## Example
 /// ```no_test
