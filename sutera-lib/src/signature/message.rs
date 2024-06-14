@@ -23,8 +23,8 @@ pub enum SuteraMessageSigningError {
 }
 
 impl SuteraSignedMessage {
-    /// Sign a message with the author's signing key.
-    /// 署名者の署名鍵でメッセージを署名する。
+    /// Sign a message with the [`author`]'s signing key.
+    /// [`author`]の署名鍵でメッセージを署名する。
     ///
     /// ## Parameters / 引数
     /// - `author`: The author of the message. / メッセージの署名者。
