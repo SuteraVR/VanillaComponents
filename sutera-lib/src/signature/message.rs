@@ -65,7 +65,6 @@ impl SuteraSignedMessage {
     /// **so this method is used as a assertion.**
     /// **署名は通常の場合、作成されたタイミングで一度検証されます。**
     /// **そのため、このメソッドはアサーションとして利用されます。**
-    /// TODO: assertionの良い和訳がわかりません！
     ///
     /// ## Return / 戻り値
     /// `true` if the signature is valid, otherwise `false`.
