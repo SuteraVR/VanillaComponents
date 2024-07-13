@@ -15,15 +15,28 @@
           inherit system overlays;
         };
         rust = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+        rust-nightly = pkgs.rust-bin.selectLatestNightlyWith (toolchain: toolchain.default);
       in {
-        devShells.default = pkgs.mkShell {
-          nativeBuildInputs = [
-            pkgs.libiconv
-            rust
-          ];
-          shellHook = ''
-            exec $SHELL
-          '';
+        devShells = {
+          default = pkgs.mkShell {
+            nativeBuildInputs = [
+              pkgs.libiconv
+              rust
+            ];
+            shellHook = ''
+              exec $SHELL
+            '';
+          };
+
+          nightly = pkgs.mkShell {
+            nativeBuildInputs = [
+              pkgs.libiconv
+              rust-nightly
+            ];
+            shellHook = ''
+              exec $SHELL
+            '';
+          };
         };
       }
     );
