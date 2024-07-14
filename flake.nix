@@ -21,7 +21,28 @@
         rust = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
         rust-beta = pkgs.rust-bin.beta.latest.default;
         rust-nightly = pkgs.rust-bin.selectLatestNightlyWith (toolchain: toolchain.default);
+
+        craneLib = crane.mkLib pkgs;
+
+        commonArgs = { source, rust }: {
+          src = craneLib.cleanCargoSource source;
+          strictDeps = true;
+
+          nativeBuildInputs = [
+            pkgs.libiconv
+            rust
+          ];
+        };
+
+        gateway-stable-args = commonArgs { source = ./gateway; inherit rust; };
+        gateway-stable = craneLib.buildPackage (gateway-stable-args // {
+          cargoArtifacts = craneLib.buildDepsOnly gateway-stable-args;
+        });
       in {
+        packages = {
+          inherit gateway-stable;
+        };
+
         devShells = {
           default = pkgs.mkShell {
             nativeBuildInputs = [
