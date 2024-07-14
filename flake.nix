@@ -15,6 +15,7 @@
           inherit system overlays;
         };
         rust = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+        rust-beta = pkgs.rust-bin.beta.latest.default;
         rust-nightly = pkgs.rust-bin.selectLatestNightlyWith (toolchain: toolchain.default);
       in {
         devShells = {
@@ -22,6 +23,16 @@
             nativeBuildInputs = [
               pkgs.libiconv
               rust
+            ];
+            shellHook = ''
+              exec $SHELL
+            '';
+          };
+
+          beta = pkgs.mkShell {
+            nativeBuildInputs = [
+              pkgs.libiconv
+              rust-beta
             ];
             shellHook = ''
               exec $SHELL
