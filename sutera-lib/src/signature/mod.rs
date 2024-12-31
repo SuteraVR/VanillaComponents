@@ -1,5 +1,5 @@
 pub mod algorithms;
-use self::algorithms::SigningAlgorithm;
+use self::algorithms::SigningAlgorithmKind;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
@@ -19,6 +19,6 @@ struct Signature {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 struct SuteraIdentity {
     display_name: String,
-    algorithm: SigningAlgorithm,
+    algorithm: SigningAlgorithmKind,
     public_key: String,
 }
