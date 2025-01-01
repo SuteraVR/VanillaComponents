@@ -2,7 +2,7 @@ use std::fmt::{Debug, Display};
 
 use tracing_error::SpanTrace;
 
-pub trait TraceableError {
+pub trait TraceableError: std::error::Error {
     fn trace(&self) -> &SpanTrace;
 }
 
@@ -14,6 +14,40 @@ pub struct CapturedError<E: std::error::Error> {
 impl<E: std::error::Error> TraceableError for CapturedError<E> {
     fn trace(&self) -> &SpanTrace {
         &self.span_trace
+    }
+}
+
+pub trait ResultTracingUnwrapExt<T, E: TraceableError> {
+    fn tracing_unwrap(self) -> T;
+}
+
+pub trait ResultCaptureErrExt<T, U: std::error::Error> {
+    fn capture_err(self) -> Result<T, CapturedError<U>>;
+}
+
+impl<T, E: TraceableError> ResultTracingUnwrapExt<T, E> for Result<T, E> {
+    #[inline(always)]
+    fn tracing_unwrap(self) -> T {
+        match self {
+            Ok(value) => value,
+            Err(ref error) => {
+                tracing::error!(error = %error, "called `unwrap()` on an `Err` Value");
+                eprintln!("== TRACING ==");
+                eprintln!("{}", error.trace());
+                self.unwrap();
+                unreachable!()
+            }
+        }
+    }
+}
+
+impl<T, U: std::error::Error> ResultCaptureErrExt<T, U> for Result<T, U> {
+    #[inline(always)]
+    fn capture_err(self) -> Result<T, CapturedError<U>> {
+        self.map_err(|error| CapturedError {
+            error,
+            span_trace: SpanTrace::capture(),
+        })
     }
 }
 

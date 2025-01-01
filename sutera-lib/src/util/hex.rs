@@ -1,12 +1,11 @@
 use std::fmt::Write;
-use std::num::ParseIntError;
 use std::str::Utf8Error;
 use tracing_error::SpanTrace;
 
 use thiserror::Error;
 use tracing::instrument;
 
-use crate::error::{CapturedError, TraceableError};
+use crate::error::{CapturedError, ResultCaptureErrExt, TraceableError};
 
 #[instrument("to_hex")]
 pub(crate) fn to_hex(data: &[u8]) -> String {
@@ -34,23 +33,13 @@ impl TraceableError for FromHexError {
     }
 }
 
-impl From<Utf8Error> for FromHexError {
-    fn from(error: Utf8Error) -> Self {
-        CapturedError::from(error).into()
-    }
-}
-
-impl From<ParseIntError> for FromHexError {
-    fn from(error: ParseIntError) -> Self {
-        CapturedError::from(error).into()
-    }
-}
-
 #[instrument("from_hex")]
 pub(crate) fn from_hex(data: &str) -> Result<Vec<u8>, FromHexError> {
     data.as_bytes()
         .chunks(2)
-        .map(|chunk| Ok(u8::from_str_radix(std::str::from_utf8(chunk)?, 16)?))
+        .map(|chunk| {
+            Ok(u8::from_str_radix(std::str::from_utf8(chunk).capture_err()?, 16).capture_err()?)
+        })
         .collect::<Result<Vec<u8>, FromHexError>>()
 }
 
