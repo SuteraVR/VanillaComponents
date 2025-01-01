@@ -2,10 +2,9 @@ pub mod ed25519;
 
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-use tracing_error::TracedError;
 
 #[derive(Error, Debug)]
-enum SignatureError {
+pub enum SignatureError {
     #[error("Invalid signature: {0}")]
     Signature(Box<dyn std::error::Error>),
     #[error("Invalid public key: {0}")]
@@ -19,10 +18,6 @@ pub struct SigningAlgorithmKind(String);
 
 pub trait SigningAlgorithm {
     fn is_capable(kind: &SigningAlgorithmKind) -> bool;
-    fn sign(data: &str, private_key: &str) -> Result<String, TracedError<SignatureError>>;
-    fn verify(
-        data: &str,
-        signature: &str,
-        public_key: &str,
-    ) -> Result<String, TracedError<SignatureError>>;
+    fn sign(data: &[u8], private_key: &str) -> Result<String, SignatureError>;
+    fn verify(data: &[u8], signature: &str, public_key: &str) -> Result<bool, SignatureError>;
 }

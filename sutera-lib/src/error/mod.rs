@@ -20,9 +20,9 @@ impl<E: std::error::Error> TraceableError for CapturedError<E> {
 pub trait ResultTracingUnwrapExt<T, E: TraceableError> {
     fn tracing_unwrap(self) -> T;
 }
-
 pub trait ResultCaptureErrExt<T, U: std::error::Error> {
     fn capture_err(self) -> Result<T, CapturedError<U>>;
+    fn capture_and_unwrap(self) -> T;
 }
 
 impl<T, E: TraceableError> ResultTracingUnwrapExt<T, E> for Result<T, E> {
@@ -48,6 +48,10 @@ impl<T, U: std::error::Error> ResultCaptureErrExt<T, U> for Result<T, U> {
             error,
             span_trace: SpanTrace::capture(),
         })
+    }
+    #[inline(always)]
+    fn capture_and_unwrap(self) -> T {
+        self.capture_err().tracing_unwrap()
     }
 }
 

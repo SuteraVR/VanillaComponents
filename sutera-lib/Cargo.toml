@@ -9,7 +9,7 @@ pretty_assertions = "1.4.0"
 tracing-subscriber = "0.3.19"
 
 [dependencies]
-ed25519-dalek = "2.1.1"
+ed25519-dalek = { version = "2.1.1" }
 serde = { version = "1.0.203", features = ["derive"] }
 serde_json_canonicalizer = "0.3.0"
 thiserror = "1.0.61"

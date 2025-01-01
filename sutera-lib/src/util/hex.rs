@@ -16,7 +16,7 @@ pub(crate) fn to_hex(data: &[u8]) -> String {
 }
 
 #[derive(Error, Debug, PartialEq, Eq)]
-enum FromHexError {
+pub enum FromHexError {
     #[error(transparent)]
     Utf8(#[from] CapturedError<Utf8Error>),
 
