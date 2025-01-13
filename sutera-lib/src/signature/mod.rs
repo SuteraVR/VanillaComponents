@@ -1,4 +1,5 @@
 pub mod algorithms;
+pub mod private_key_masked;
 use self::algorithms::SigningAlgorithmKind;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -22,3 +23,6 @@ struct SuteraIdentity {
     algorithm: SigningAlgorithmKind,
     public_key: String,
 }
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+struct SuteraPrivateKey {}
