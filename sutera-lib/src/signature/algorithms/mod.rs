@@ -1,7 +1,15 @@
 pub mod ed25519;
+mod macros;
 
+#[cfg(test)]
+mod tests;
+
+use rand_core::CryptoRngCore;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+
+use self::ed25519::Ed25519;
+use self::macros::algorithm_action;
 
 use super::{Signature, SuteraIdentity};
 
@@ -24,18 +32,9 @@ pub struct SigningAlgorithmKind(String);
 trait SigningAlgorithm {
     fn is_capable(kind: &SigningAlgorithmKind) -> bool;
     fn sign(data: &[u8], private_key: &str) -> Result<String, SignatureError>;
+    fn to_public_key(private_key: &str) -> Result<String, SignatureError>;
     fn verify(data: &[u8], signature: &str, public_key: &str) -> Result<bool, SignatureError>;
-}
-
-macro_rules! algorithm_action {
-    ($kind:expr => $e:expr) => {
-        if $crate::signature::algorithms::ed25519::Ed25519::is_capable($kind) {
-            type Algorithm = $crate::signature::algorithms::ed25519::Ed25519;
-            Some($e)
-        } else {
-            None
-        }
-    };
+    fn generate_private_key<R: CryptoRngCore + ?Sized>(rng: &mut R) -> String;
 }
 
 impl SuteraIdentity {

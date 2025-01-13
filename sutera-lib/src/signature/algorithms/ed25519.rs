@@ -1,11 +1,12 @@
 use std::str::FromStr;
 
 use crate::error::ResultCaptureErrExt;
-use crate::util::hex::{from_hex, FromHexError};
+use crate::util::hex::{from_hex, to_hex, FromHexError};
 
 use super::{SigningAlgorithm, SigningAlgorithmKind};
 use ed25519_dalek::ed25519::signature::SignerMut;
 use ed25519_dalek::{Signature, SigningKey, VerifyingKey, PUBLIC_KEY_LENGTH, SECRET_KEY_LENGTH};
+use rand_core::CryptoRngCore;
 use thiserror::Error;
 use tracing::instrument;
 
@@ -54,14 +55,27 @@ impl SigningAlgorithm for Ed25519 {
         kind.0 == "ed25519"
     }
 
-    #[instrument("sign", skip(data, private_key))]
+    #[instrument("sign", skip_all)]
     fn sign(data: &[u8], private_key: &str) -> Result<String, super::SignatureError> {
         let mut private_key = parse_signing_key(private_key)
             .map_err(|e| super::SignatureError::PrivateKey(Box::new(e)))?;
         Ok(private_key.try_sign(data).capture_and_unwrap().to_string())
     }
 
-    #[instrument("verify", skip(data, signature, public_key))]
+    #[instrument("to_public_key", skip_all)]
+    fn to_public_key(private_key: &str) -> Result<String, super::SignatureError> {
+        let private_key = parse_signing_key(private_key)
+            .map_err(|e| super::SignatureError::PrivateKey(Box::new(e)))?;
+        Ok(to_hex(&private_key.verifying_key().to_bytes()))
+    }
+
+    #[instrument("generate_private_key", skip_all)]
+    fn generate_private_key<R: CryptoRngCore + ?Sized>(rng: &mut R) -> String {
+        let private_key = SigningKey::generate(rng);
+        to_hex(&private_key.to_bytes())
+    }
+
+    #[instrument("verify", skip_all)]
     fn verify(
         data: &[u8],
         signature: &str,
