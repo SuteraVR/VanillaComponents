@@ -3,8 +3,12 @@ pub mod ed25519;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use super::{Signature, SuteraIdentity};
+
 #[derive(Error, Debug)]
 pub enum SignatureError {
+    #[error("Algorithm not supported: {0:?}")]
+    AlgorithmNotSupported(SigningAlgorithmKind),
     #[error("Invalid signature: {0}")]
     Signature(Box<dyn std::error::Error>),
     #[error("Invalid public key: {0}")]
@@ -16,8 +20,37 @@ pub enum SignatureError {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct SigningAlgorithmKind(String);
 
-pub trait SigningAlgorithm {
+#[allow(dead_code)]
+trait SigningAlgorithm {
     fn is_capable(kind: &SigningAlgorithmKind) -> bool;
     fn sign(data: &[u8], private_key: &str) -> Result<String, SignatureError>;
     fn verify(data: &[u8], signature: &str, public_key: &str) -> Result<bool, SignatureError>;
+}
+
+macro_rules! algorithm_action {
+    ($kind:expr => $e:expr) => {
+        if $crate::signature::algorithms::ed25519::Ed25519::is_capable($kind) {
+            type Algorithm = $crate::signature::algorithms::ed25519::Ed25519;
+            Some($e)
+        } else {
+            None
+        }
+    };
+}
+
+impl SuteraIdentity {
+    pub fn verify(&self, data: &[u8], signature: &str) -> Result<bool, SignatureError> {
+        algorithm_action!(&self.algorithm => {
+            Algorithm::verify(data, signature, &self.public_key)
+        })
+        .ok_or(SignatureError::AlgorithmNotSupported(
+            self.algorithm.clone(),
+        ))?
+    }
+}
+
+impl Signature {
+    pub fn verify(&self, data: &[u8]) -> Result<bool, SignatureError> {
+        self.identity.verify(data, &self.signature)
+    }
 }
