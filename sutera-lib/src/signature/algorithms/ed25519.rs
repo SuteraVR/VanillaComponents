@@ -88,6 +88,3 @@ impl SigningAlgorithm for Ed25519 {
         Ok(public_key.verify_strict(data, &signature).is_ok())
     }
 }
-
-// TODO: テストを書く
-// TODO: `generate_private`, `to_public` を実装する
