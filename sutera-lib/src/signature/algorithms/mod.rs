@@ -10,7 +10,7 @@ use thiserror::Error;
 
 use self::macros::algorithm_action;
 
-use super::{Signature, SuteraIdentity};
+use super::{Signature, SuteraIdentity, SuteraPrivateKey};
 
 #[derive(Error, Debug)]
 pub enum SignatureError {
@@ -28,12 +28,12 @@ pub enum SignatureError {
 pub struct SigningAlgorithmKind(String);
 
 #[allow(dead_code)]
-trait SigningAlgorithm {
+pub trait SigningAlgorithm {
     fn is_capable(kind: &SigningAlgorithmKind) -> bool;
-    fn sign(data: &[u8], private_key: &str) -> Result<String, SignatureError>;
-    fn to_public_key(private_key: &str) -> Result<String, SignatureError>;
+    fn sign(data: &[u8], private_key: &SuteraPrivateKey) -> Result<String, SignatureError>;
+    fn to_public_key(private_key: &SuteraPrivateKey) -> Result<String, SignatureError>;
     fn verify(data: &[u8], signature: &str, public_key: &str) -> Result<bool, SignatureError>;
-    fn generate_private_key<R: CryptoRngCore + ?Sized>(rng: &mut R) -> String;
+    fn generate_private_key<R: CryptoRngCore + ?Sized>(rng: &mut R) -> SuteraPrivateKey;
 }
 
 impl SuteraIdentity {

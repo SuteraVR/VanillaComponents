@@ -9,7 +9,7 @@ use tracing::instrument;
 use crate::error::{CapturedError, ResultCaptureErrExt, TraceableError};
 use crate::signature::private_key_masked::PrivateKeyMasked;
 
-trait HexString: Debug {
+pub(crate) trait HexString: Debug {
     fn content(&self) -> &str;
 }
 
