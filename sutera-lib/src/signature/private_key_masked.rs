@@ -26,25 +26,22 @@ impl<T: ?Sized> PrivateKeyMasked<T> {
 
 impl<T> PrivateKeyMasked<T> {}
 
+const SECRET_IN_LOG_WARNING_LEFT: &str = "(!WARNING[SECRET-IN-LOG] Following angle bracket contains information from which a private key may be derived. Please be sure to mask this log when sharing it with others! / 警告! 続く山括弧の中には, あなたの秘密鍵を推測する材料となり得る情報が含まれます。 このログを他者と共有する際には, 該当部分を必ず隠してください。<";
+const SECRET_IN_LOG_WARNING_RIGHT: &str = ">)";
+
 impl<T: Debug + ?Sized> Debug for PrivateKeyMasked<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "(!WARNING[SECRET-IN-LOG] Following angle bracket contains information from which a private key may be derived. Please be sure to mask this log when sharing it with others! <"
-        )?;
+        f.write_str(SECRET_IN_LOG_WARNING_LEFT)?;
         <T as Debug>::fmt(&self.0, f)?;
-        write!(f, ">)")
+        f.write_str(SECRET_IN_LOG_WARNING_RIGHT)
     }
 }
 
 impl<T: Display> Display for PrivateKeyMasked<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "(!WARNING[SECRET-IN-LOG] Following angle bracket contains information from which a private key may be derived. Please be sure to mask this log when sharing it with others! <",
-        )?;
+        f.write_str(SECRET_IN_LOG_WARNING_LEFT)?;
         <T as Display>::fmt(&self.0, f)?;
-        write!(f, ">)")
+        f.write_str(SECRET_IN_LOG_WARNING_RIGHT)
     }
 }
 
@@ -89,7 +86,10 @@ mod tests {
     fn debug_print_should_masked_string() {
         assert_eq!(
             format!("{:?}", PrivateKeyMasked("SUPERSECRET")),
-            "(!WARNING[SECRET-IN-LOG] Following angle bracket contains information from which a private key may be derived. Please be sure to mask this log when sharing it with others! <\"SUPERSECRET\">)"
+            format!(
+                "{}{}{}",
+                SECRET_IN_LOG_WARNING_LEFT, "\"SUPERSECRET\"", SECRET_IN_LOG_WARNING_RIGHT
+            )
         );
     }
 
@@ -97,7 +97,10 @@ mod tests {
     fn display_print_should_masked_string() {
         assert_eq!(
             format!("{}", PrivateKeyMasked("SUPERSECRET")),
-            "(!WARNING[SECRET-IN-LOG] Following angle bracket contains information from which a private key may be derived. Please be sure to mask this log when sharing it with others! <SUPERSECRET>)"
+            format!(
+                "{}{}{}",
+                SECRET_IN_LOG_WARNING_LEFT, "SUPERSECRET", SECRET_IN_LOG_WARNING_RIGHT
+            )
         );
     }
 }
