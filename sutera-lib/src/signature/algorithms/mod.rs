@@ -8,7 +8,6 @@ use rand_core::CryptoRngCore;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use self::ed25519::Ed25519;
 use self::macros::algorithm_action;
 
 use super::{Signature, SuteraIdentity};

@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use std::fmt::Write;
 use std::str::Utf8Error;
 use tracing_error::SpanTrace;
@@ -6,10 +7,55 @@ use thiserror::Error;
 use tracing::instrument;
 
 use crate::error::{CapturedError, ResultCaptureErrExt, TraceableError};
+use crate::signature::private_key_masked::PrivateKeyMasked;
+
+trait HexString: Debug {
+    fn content(&self) -> &str;
+}
+
+impl HexString for str {
+    fn content(&self) -> &str {
+        self
+    }
+}
+
+impl HexString for String {
+    fn content(&self) -> &str {
+        self
+    }
+}
+
+impl<T: HexString> HexString for PrivateKeyMasked<T> {
+    fn content(&self) -> &str {
+        self.get_raw().content()
+    }
+}
+
+trait Binary: Debug {
+    fn content(&self) -> &[u8];
+}
+
+impl<const N: usize> Binary for [u8; N] {
+    fn content(&self) -> &[u8] {
+        self
+    }
+}
+
+impl Binary for Vec<u8> {
+    fn content(&self) -> &[u8] {
+        self
+    }
+}
+
+impl<T: Binary> Binary for PrivateKeyMasked<T> {
+    fn content(&self) -> &[u8] {
+        self.get_raw().content()
+    }
+}
 
 #[instrument("to_hex")]
-pub(crate) fn to_hex(data: &[u8]) -> String {
-    data.iter().fold(String::new(), |mut acc, byte| {
+pub(crate) fn to_hex(data: &impl Binary) -> String {
+    data.content().iter().fold(String::new(), |mut acc, byte| {
         write!(acc, "{byte:02x}").unwrap();
         acc
     })
@@ -34,8 +80,9 @@ impl TraceableError for FromHexError {
 }
 
 #[instrument("from_hex")]
-pub(crate) fn from_hex(data: &str) -> Result<Vec<u8>, FromHexError> {
-    data.as_bytes()
+pub(crate) fn from_hex<H: HexString + ?Sized>(data: &H) -> Result<Vec<u8>, FromHexError> {
+    data.content()
+        .as_bytes()
         .chunks(2)
         .map(|chunk| {
             Ok(u8::from_str_radix(std::str::from_utf8(chunk).capture_err()?, 16).capture_err()?)
